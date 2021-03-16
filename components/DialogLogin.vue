@@ -8,18 +8,44 @@
       </template>
       <!-- sign dialog -->
       <v-card>
-        <v-tabs v-model="tab">
-          <v-tab key="1">登陆</v-tab>
-          <v-tab key="2">注册</v-tab>
-        </v-tabs>
-        <v-tabs-items v-model="tab">
-          <v-tab-item key="1">
-            <CardSignIn @submit="SignEvent"/>
-          </v-tab-item>
-          <v-tab-item key="2">
-            <CardSignUp @submit="SignEvent"/>
-          </v-tab-item>
-        </v-tabs-items>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field
+                  label="Username"
+                  hint="请输入用户名"
+                  clearable
+                  v-model="user.username"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  label="Password"
+                  :append-icon="pwdShow ? 'mdi-eye' : 'mdi-eye-off'"
+                  :type="pwdShow ? 'text' : 'password'"
+                  hint="请输入密码"
+                  @click:append="pwdShow = !pwdShow"
+                  v-model="user.password"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer/>
+          <v-btn
+            color="blue darken-1"
+            text
+            :loading="loading"
+            @click="UserSignIn"
+          >登录</v-btn>
+          <v-btn
+            color="blue darken-1"
+            text
+            @click="DialogClose"
+          >取消</v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
     <!-- account button -->
@@ -40,19 +66,21 @@
 </template>
 
 <script>
-  import CardSignIn from "./CardSignIn";
-  import CardSignUp from "./CardSignUp";
   export default {
     name: "CardLogin",
     components: {
-      CardSignIn,
-      CardSignUp,
     },
     data() {
       return {
         tab: null,
         dialog: false,
         authorization: false,
+        loading: false,
+        pwdShow: false,
+        user: {
+          username: null,
+          password: null,
+        },
       }
     },
     props: {
@@ -64,6 +92,20 @@
       },
       SignOut:function () {
         this.authorization=false;
+      },
+      UserSignIn:function() {
+        this.loading=true
+        setTimeout(()=>{
+          this.loading=false
+          this.$emit('submit',true)
+          this.username=null
+          this.password=null
+        },2000)
+      },
+      DialogClose:function() {
+        this.$emit('submit',false)
+        this.username=null
+        this.password=null
       }
     }
   }
